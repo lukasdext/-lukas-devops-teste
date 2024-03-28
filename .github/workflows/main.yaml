@@ -48,7 +48,7 @@ jobs:
           ECR_REPOSITORY: my-repo
           ECS_SERVICE: my-service
           ECS_CLUSTER: my-cluster
-          ECS_TASK_DEFINITION: Dockerfile
+          ECS_TASK_DEFINITION: task_definition.json
           CONTAINER_NAME: CONTAINER_TESTE_DEVOPS
       
         steps:
