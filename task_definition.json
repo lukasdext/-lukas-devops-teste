@@ -2,8 +2,8 @@
     "family": "my-task",
     "containerDefinitions": [
       {
-        "name": "my-container",
-        "image": "your-container-image",
+        "name": "CONTAINER_TESTE_DEVOPS",
+        "image": "***.dkr.ecr.us-east-1.amazonaws.com/my-repo:ab39e564a956eeea7dc88077f5ef03f640195bed",
         "cpu": 256,
         "memory": 512,
         "portMappings": [
