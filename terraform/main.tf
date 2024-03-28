@@ -25,7 +25,11 @@ resource "aws_subnet" "my_subnets" {
   count             = length(var.subnet_cidrs)
   vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = var.subnet_cidrs[count.index]
-  availability_zone = "us-east-1"
+  availability_zone = "us-east-1a"
+  
+  tags = {
+    Name = "testedevops-${count.index + 1}"
+  }
 }
 
 # Criação do grupo de segurança
