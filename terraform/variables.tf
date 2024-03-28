@@ -26,3 +26,10 @@ variable "task_memory" {
   description = "Quantidade de memória alocada para a tarefa ECS em megabytes"
   default     = 512
 }
+
+variable "container_name" {
+  type    = string
+  description = "The name of the container in the containerDefinitions section of your task definition"
+  # Valor padrão opcional, se necessário
+  default = "my-container"
+}

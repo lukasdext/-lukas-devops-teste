@@ -49,7 +49,7 @@ jobs:
           ECS_SERVICE: my-service
           ECS_CLUSTER: my-cluster
           ECS_TASK_DEFINITION: my-task
-          CONTAINER_NAME: MY_CONTAINER_NAME
+          CONTAINER_NAME: CONTAINER_TESTE_DEVOPS
       
         steps:
           - name: Checkout
