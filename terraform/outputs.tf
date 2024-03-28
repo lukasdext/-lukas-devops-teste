@@ -13,3 +13,8 @@ output "service_name" {
   description = "Nome do serviço ECS criado"
   value       = aws_ecs_service.my_service.name
 }
+
+# Armazenar a ARN da definição de tarefa ECS em uma variável de saída
+output "ecs_task_definition_arn" {
+  value = aws_ecs_task_definition.my_task.arn
+}

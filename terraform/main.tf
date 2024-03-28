@@ -77,6 +77,10 @@ resource "aws_ecs_task_definition" "my_task" {
   ])
 }
 
+
+
+
+
 # Criação do serviço ECS
 resource "aws_ecs_service" "my_service" {
   name            = "my-service"
