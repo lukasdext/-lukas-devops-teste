@@ -11,6 +11,10 @@ provider "aws" {
   region = "us-east-1"  
 }
 
+resource "aws_ecr_repository" "my_repo" {
+  name = "my-repo"  # Nome do repositório
+}
+
 # Criação do VPC
 resource "aws_vpc" "my_vpc" {
   cidr_block = "10.0.0.0/16"
@@ -78,8 +82,8 @@ resource "aws_ecs_service" "my_service" {
   name            = "my-service"  # Nome do serviço ECS
   cluster         = aws_ecs_cluster.my_cluster.id
   task_definition = aws_ecs_task_definition.my_task.arn
-  desired_count   = 1  # Número de tarefas a serem executadas
-  launch_type     = "FARGATE"  # Tipo de lançamento (FARGATE ou EC2)
+  desired_count   = 1  
+  launch_type     = "FARGATE"  
 
   network_configuration {
     subnets         = aws_subnet.my_subnets[*].id  # IDs das sub-redes onde as tarefas serão executadas
