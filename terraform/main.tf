@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "5.42.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"  
+}
+
 # Criação do VPC
 resource "aws_vpc" "my_vpc" {
   cidr_block = "10.0.0.0/16"
@@ -74,3 +87,6 @@ resource "aws_ecs_service" "my_service" {
   }
 }
 
+resource "aws_ecr_repository" "my_repo" {
+  name = "my-repo"  # Nome do repositório
+}
