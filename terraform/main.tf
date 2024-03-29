@@ -34,6 +34,17 @@ resource "aws_ecs_cluster" "my_cluster" {
   name = "my-cluster"
 }
 
+data "aws_iam_policy_document" "assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_iam_role" "task_execution_role" {
   name               = "ecs-task-execution-role"
   assume_role_policy = jsonencode({
