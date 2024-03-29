@@ -52,9 +52,6 @@ resource "aws_iam_role" "ecsTaskExecutionRole" {
 }
 
 
-
-
-
 resource "aws_iam_policy" "ecsPolicy" {
   name        = "ecsPolicy"
   description = "Policy for ECS task registration"
@@ -150,8 +147,6 @@ data "aws_region" "current" {}
 #######################################################
 
 
-
-
 resource "aws_ecs_task_definition" "my_task" {
   family                   = "my-task"
   network_mode             = "awsvpc"
@@ -188,7 +183,7 @@ resource "aws_ecs_service" "my_service" {
   name            = "my-service"
   cluster         = aws_ecs_cluster.my_cluster.id
   task_definition = aws_ecs_task_definition.my_task.arn
-  desired_count   = 1
+  desired_count   = 2
   launch_type     = "FARGATE"
   
   network_configuration {
