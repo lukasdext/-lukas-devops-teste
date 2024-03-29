@@ -35,40 +35,6 @@ resource "aws_ecs_cluster" "my_cluster" {
 }
 ####################################################################################################
 
-resource "aws_iam_role" "my_task_role" {
-  name               = "my-task-role"
-  assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [{
-      "Effect": "Allow",
-      "Principal": { "Service": "ecs-tasks.amazonaws.com" },
-      "Action": "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "my_task_role_attachment" {
-  role       = aws_iam_role.my_task_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-resource "aws_iam_role" "my_task_execution_role" {
-  name               = "my-task-execution-role"
-  assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [{
-      "Effect": "Allow",
-      "Principal": { "Service": "ecs-tasks.amazonaws.com" },
-      "Action": "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "my_task_execution_role_attachment" {
-  role       = aws_iam_role.my_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
 resource "aws_iam_role" "ecsTaskExecutionRole" {
   name               = "ecsTaskExecutionRole"
   assume_role_policy = jsonencode({
@@ -101,6 +67,14 @@ resource "aws_iam_policy" "ecsPolicy" {
         "Resource": "*"
       },
       {
+        "Sid": "UpdateService",
+        "Effect": "Allow",
+        "Action": [
+          "ecs:UpdateService"
+        ],
+        "Resource": "*"
+      },
+      {
         "Sid": "PassRolesInTaskDefinition",
         "Effect": "Allow",
         "Action": [
@@ -121,6 +95,38 @@ resource "aws_iam_policy" "ecsPolicy" {
         "Resource": [
           "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/my-cluster/my-service"
         ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": "ecr:GetAuthorizationToken",
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ecs:RegisterTaskDefinition",
+          "ecs:UpdateService"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": "iam:*",
+        "Resource": [
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/*",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:group/*"
+        ]
       }
     ]
   })
@@ -134,6 +140,8 @@ resource "aws_iam_role_policy_attachment" "ecsPolicyAttachment" {
 data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
+
+
 
 #######################################################
 
