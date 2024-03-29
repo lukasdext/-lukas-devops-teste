@@ -79,8 +79,12 @@ resource "aws_iam_policy" "ecs_policy" {
         "Sid": "DeployService",
         "Effect": "Allow",
         "Action": [
-          "ecs:UpdateService",
-          "ecs:DescribeServices"
+          "ecs:DescribeServices",
+          "codedeploy:GetDeploymentGroup",
+          "codedeploy:CreateDeployment",
+          "codedeploy:GetDeployment",
+          "codedeploy:GetDeploymentConfig",
+          "codedeploy:RegisterApplicationRevision"
         ],
         "Resource": "*"
       }
