@@ -60,47 +60,33 @@ resource "aws_iam_policy" "ecs_policy" {
     "Version": "2012-10-17",
     "Statement": [
       {
+        "Sid": "RegisterTaskDefinition",
         "Effect": "Allow",
         "Action": [
-          "ecs:RegisterTaskDefinition",
-          "ecs:UpdateService",
-          "ecs:RunTask"
+          "ecs:RegisterTaskDefinition"
         ],
         "Resource": "*"
       },
       {
-         "Sid":"PassRolesInTaskDefinition",
-         "Effect":"Allow",
-         "Action":[
-            "iam:PassRole"
-         ],
-         "Resource":[
-            "arn:aws:iam::123456789012:role/your_task_role_name",
-            "arn:aws:iam::123456789012:role/your_task_execution_role_name"
-         ]
+        "Sid": "PassRolesInTaskDefinition",
+        "Effect": "Allow",
+        "Action": [
+          "iam:PassRole"
+        ],
+        "Resource": "*"
       },
       {
-         "Sid":"DeployService",
-         "Effect":"Allow",
-         "Action":[
-            "ecs:DescribeServices",
-            "codedeploy:GetDeploymentGroup",
-            "codedeploy:CreateDeployment",
-            "codedeploy:GetDeployment",
-            "codedeploy:GetDeploymentConfig",
-            "codedeploy:RegisterApplicationRevision"
-         ],
-         "Resource":[
-            "arn:aws:ecs:us-east-1:123456789012:service/my-cluster/my-service",
-            "arn:aws:codedeploy:us-east-1:123456789012:deploymentgroup:your_application_name/your_deployment_group_name",
-            "arn:aws:codedeploy:us-east-1:123456789012:deploymentconfig:*",
-            "arn:aws:codedeploy:us-east-1:123456789012:application:your_application_name"
-         ]
+        "Sid": "DeployService",
+        "Effect": "Allow",
+        "Action": [
+          "ecs:UpdateService",
+          "ecs:DescribeServices"
+        ],
+        "Resource": "*"
       }
     ]
   })
 }
-
 
 resource "aws_iam_role_policy_attachment" "ecs_attachment" {
   role       = aws_iam_role.task_execution_role.name
