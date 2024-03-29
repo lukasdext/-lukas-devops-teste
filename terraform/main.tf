@@ -97,20 +97,21 @@ resource "aws_iam_role" "task_execution_role" {
 }
 
 resource "aws_iam_policy" "ecs_policy" {
-  name   = "ecs-policy"
-
+  name        = "ecs-policy"
+  description = "Policy for ECS task registration"
+  
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    Version = "2012-10-17",
+    Statement = [
       {
-        "Effect": "Allow",
-        "Action": [
+        Effect   = "Allow",
+        Action   = [
           "ecs:CreateCluster",
           "ecs:RegisterTaskDefinition",
           "ecs:UpdateService",
           "ecs:RunTask"
         ],
-        "Resource": "*"
+        Resource = "*"
       }
     ]
   })
