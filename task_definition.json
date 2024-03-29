@@ -3,7 +3,8 @@
   "networkMode": "awsvpc",
   "cpu": "256",
   "memory": "512",
-  "executionRoleArn": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::__AWS_ACCONT_COD__:role/ecsTaskExecutionRole",
+
   "containerDefinitions": [
     {
       "name": "CONTAINER_TESTE_DEVOPS",

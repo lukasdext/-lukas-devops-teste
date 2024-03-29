@@ -51,6 +51,8 @@ jobs:
           ECS_CLUSTER: my-cluster
           ECS_TASK_DEFINITION: task_definition.json
           CONTAINER_NAME: CONTAINER_TESTE_DEVOPS
+
+ 
       
         steps:
           - name: Checkout
@@ -79,6 +81,10 @@ jobs:
               docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
               docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
               echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          - name: Replace credentials
+            run: |
+                sed -i 's/__AWS_ACCONT_COD__/${{ secrets.AWS_ACCONT_COD }}/g' task_definition.json
+            
       
           - name: Fill in the new image ID in the Amazon ECS task definition
             id: task-def
