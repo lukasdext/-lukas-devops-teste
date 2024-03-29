@@ -1,143 +1,122 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "5.42.0"
-    }
-  }
-}
-
 provider "aws" {
-  region = "us-east-1"
+  region = "us-east-1" # Defina a região desejada
 }
 
 resource "aws_ecr_repository" "my_repo" {
   name = "my-repo"
 }
 
-# Criação do VPC
 resource "aws_vpc" "my_vpc" {
   cidr_block = "10.0.0.0/16"
 }
 
-# Criação das sub-redes
-resource "aws_subnet" "my_subnets" {
-  count             = length(var.subnet_cidrs)
+resource "aws_subnet" "public_subnet" {
   vpc_id            = aws_vpc.my_vpc.id
-  cidr_block        = var.subnet_cidrs[count.index]
-  availability_zone = "us-east-1a"
-  
-  tags = {
-    Name = "testedevops-${count.index + 1}"
-  }
+  cidr_block        = "10.0.1.0/24" # Substitua pelo bloco CIDR desejado para a subnet pública
+  availability_zone = "us-east-1a"  # Substitua pela zona de disponibilidade desejada
+  map_public_ip_on_launch = true
 }
 
-# Criação do grupo de segurança
-resource "aws_security_group" "ecs_security_group" {
-  name        = "ecs-security-group"
-  description = "Security group for ECS service"
-
-  # Regras de entrada (ingress)
+resource "aws_security_group" "ecs_sg" {
+  vpc_id      = aws_vpc.my_vpc.id
+  name        = "ecs-sg"
+  description = "Security group for ECS tasks"
+  
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Permitindo acesso de qualquer lugar
-  }
-
-  # Regras de saída (egress)
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]  # Permitindo tráfego para qualquer lugar
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-# Criação do cluster ECS
 resource "aws_ecs_cluster" "my_cluster" {
   name = "my-cluster"
 }
 
-# Definição da tarefa ECS
 resource "aws_ecs_task_definition" "my_task" {
   family                   = "my-task"
   network_mode             = "awsvpc"
-  cpu                      = var.task_cpu
-  memory                   = var.task_memory
+  cpu                      = "256"
+  memory                   = "512"
+  
+  execution_role_arn       = aws_iam_role.task_execution_role.arn
 
   container_definitions = jsonencode([
     {
-      "name"            : "my-container",
-      "image"           : var.task_image,
-      "cpu"             : var.task_cpu,
-      "memory"          : var.task_memory,
-      "portMappings"    : [
+      "name": "my-container",
+      "image": "your-docker-image-url",
+      "essential": true,
+      "portMappings": [
         {
-          "containerPort": 80
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp"
         }
-      ]
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "ecs-logs",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
     }
   ])
 }
 
-
-
-# Criação do serviço ECS
 resource "aws_ecs_service" "my_service" {
   name            = "my-service"
   cluster         = aws_ecs_cluster.my_cluster.id
   task_definition = aws_ecs_task_definition.my_task.arn
   desired_count   = 1
   launch_type     = "FARGATE"
-
+  
   network_configuration {
-    subnets         = aws_subnet.my_subnets[*].id
+    subnets         = [aws_subnet.public_subnet.id]
     assign_public_ip = true
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.my_target_group.arn
-    container_name   = "my-container"
-    container_port   = 80
+    security_groups = [aws_security_group.ecs_sg.id]
   }
 }
 
-resource "aws_lb" "my_alb" {
-  name               = "my-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.ecs_security_group.id]
-  subnets            = [
-    aws_subnet.my_subnets[0].id,
-    aws_subnet.my_subnets[1].id,  # Adicione mais sub-redes conforme necessário
-  ]
-
-  tags = {
-    Name = "my-alb"
-  }
+resource "aws_iam_role" "task_execution_role" {
+  name               = "ecs-task-execution-role"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "ecs-tasks.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  })
 }
 
-resource "aws_lb_target_group" "my_target_group" {
-  name     = "my-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.my_vpc.id
+resource "aws_iam_policy" "ecs_policy" {
+  name   = "ecs-policy"
 
-  target_type = "ip"
-
-  health_check {
-    path                = "/"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    matcher             = "200"
-  }
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ecs:CreateCluster",
+          "ecs:RegisterTaskDefinition",
+          "ecs:UpdateService",
+          "ecs:RunTask"
+        ],
+        "Resource": "*"
+      }
+    ]
+  })
 }
 
-resource "aws_lb_target_group_attachment" "my_target_group_attachment" {
-  target_group_arn = aws_lb_target_group.my_target_group.arn
-  target_id        = aws_ecs_service.my_service.id
-  port             = 80
+resource "aws_iam_role_policy_attachment" "ecs_attachment" {
+  role       = aws_iam_role.task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_policy.arn
 }
