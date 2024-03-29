@@ -18,3 +18,11 @@ output "ecs_task_definition_arn" {
   value = aws_ecs_task_definition.my_task.arn
 
 }
+
+output "aws_account_id" {
+  value = data.aws_caller_identity.current.account_id
+}
+
+output "ecsTaskExecutionRole_arn" {
+  value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskExecutionRole"
+}

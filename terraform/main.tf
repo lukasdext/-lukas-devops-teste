@@ -35,37 +35,118 @@ resource "aws_ecs_cluster" "my_cluster" {
 }
 ####################################################################################################
 
-
-resource "aws_iam_role" "ecsTaskExecutionRole" {
-  name               = "ecsTaskExecutionRole"
-  assume_role_policy = "${data.aws_iam_policy_document.assume_role_policy.json}"
+resource "aws_iam_role" "my_task_role" {
+  name               = "my-task-role"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Principal": { "Service": "ecs-tasks.amazonaws.com" },
+      "Action": "sts:AssumeRole"
+    }]
+  })
 }
 
-data "aws_iam_policy_document" "assume_role_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
-  role       = aws_iam_role.ecsTaskExecutionRole.name
+resource "aws_iam_role_policy_attachment" "my_task_role_attachment" {
+  role       = aws_iam_role.my_task_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-output "aws_account_id" {
-  value = data.aws_caller_identity.current.account_id
+resource "aws_iam_role" "my_task_execution_role" {
+  name               = "my-task-execution-role"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Principal": { "Service": "ecs-tasks.amazonaws.com" },
+      "Action": "sts:AssumeRole"
+    }]
+  })
 }
 
-output "ecsTaskExecutionRole_arn" {
-  value = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskExecutionRole"
+resource "aws_iam_role_policy_attachment" "my_task_execution_role_attachment" {
+  role       = aws_iam_role.my_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+resource "aws_iam_role" "ecsTaskExecutionRole" {
+  name               = "ecsTaskExecutionRole"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "ecs-tasks.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "ecsPolicy" {
+  name        = "ecsPolicy"
+  description = "Policy for ECS task registration"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "RegisterTaskDefinition",
+        "Effect": "Allow",
+        "Action": [
+          "ecs:RegisterTaskDefinition"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "PassRolesInTaskDefinition",
+        "Effect": "Allow",
+        "Action": [
+          "iam:PassRole"
+        ],
+        "Resource": [
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/my-task-role",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/my-task-execution-role"
+        ]
+      },
+      {
+        "Sid": "DeployService",
+        "Effect": "Allow",
+        "Action": [
+          "ecs:UpdateService",
+          "ecs:DescribeServices"
+        ],
+        "Resource": [
+          "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/my-cluster/my-service"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecsPolicyAttachment" {
+  role       = aws_iam_role.ecsTaskExecutionRole.name
+  policy_arn = aws_iam_policy.ecsPolicy.arn
 }
 
 data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {}
 
 #######################################################
 
