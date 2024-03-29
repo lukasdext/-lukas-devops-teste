@@ -43,6 +43,13 @@ jobs:
         runs-on: ubuntu-latest
         environment: production
         needs: build
+
+        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
+        with:
+          task-definition: /home/runner/work/_temp/task-definition--2117-ubGt8t5TauO7-.json
+          service: my-service
+          cluster: my-cluster
+          wait-for-service-stability: true
         env:
           AWS_REGION: us-east-1
           ECR_REPOSITORY: my-repo
