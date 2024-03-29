@@ -34,6 +34,47 @@ resource "aws_ecs_cluster" "my_cluster" {
   name = "my-cluster"
 }
 
+resource "aws_iam_role" "task_execution_role" {
+  name               = "ecs-task-execution-role"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "ecs-tasks.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "ecs_policy" {
+  name        = "ecs-policy"
+  description = "Policy for ECS task registration"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "ecs:RegisterTaskDefinition",
+          "ecs:UpdateService",
+          "ecs:RunTask"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_attachment" {
+  role       = aws_iam_role.task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_policy.arn
+}
+
 resource "aws_ecs_task_definition" "my_task" {
   family                   = "my-task"
   network_mode             = "awsvpc"
@@ -78,46 +119,4 @@ resource "aws_ecs_service" "my_service" {
     assign_public_ip = true
     security_groups = [aws_security_group.ecs_sg.id]
   }
-}
-
-resource "aws_iam_role" "task_execution_role" {
-  name               = "ecs-task-execution-role"
-  assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "ecs-tasks.amazonaws.com"
-        },
-        "Action": "sts:AssumeRole"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_policy" "ecs_policy" {
-  name        = "ecs-policy"
-  description = "Policy for ECS task registration"
-  
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = [
-          "ecs:CreateCluster",
-          "ecs:RegisterTaskDefinition",
-          "ecs:UpdateService",
-          "ecs:RunTask"
-        ],
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_attachment" {
-  role       = aws_iam_role.task_execution_role.name
-  policy_arn = aws_iam_policy.ecs_policy.arn
 }
