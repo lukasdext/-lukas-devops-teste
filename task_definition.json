@@ -6,7 +6,7 @@
   "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "my-container",
+      "name": "CONTAINER_TESTE_DEVOPS",
       "image": "your-docker-image-url",
       "essential": true,
       "portMappings": [
