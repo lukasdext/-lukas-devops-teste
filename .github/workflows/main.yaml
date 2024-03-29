@@ -48,8 +48,8 @@ jobs:
           AWS_REGION: us-east-1
           ECR_REPOSITORY: my-repo
           ECS_SERVICE: my-service
-          ECS_CLUSTER: arn:aws:ecs:us-east-1:730335647486:cluster/my-cluste
-          ECS_TASK_DEFINITION: arn:aws:ecs:us-east-1:730335647486:task-definition/my-task:23
+          ECS_CLUSTER: my-cluster
+          ECS_TASK_DEFINITION: task_definition.json
           CONTAINER_NAME: CONTAINER_TESTE_DEVOPS
       
         steps:
@@ -91,7 +91,7 @@ jobs:
           - name: Deploy Amazon ECS task definition
             uses: aws-actions/amazon-ecs-deploy-task-definition@v1
             with:
-              task-definition: ${{ env.ECS_TASK_DEFINITION }}
+              task-definition: task_definition.json
               service: ${{ env.ECS_SERVICE }}
               cluster: ${{ env.ECS_CLUSTER }}
               wait-for-service-stability: true
