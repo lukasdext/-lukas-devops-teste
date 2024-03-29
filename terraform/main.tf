@@ -12,8 +12,8 @@ resource "aws_vpc" "my_vpc" {
 
 resource "aws_subnet" "public_subnet" {
   vpc_id            = aws_vpc.my_vpc.id
-  cidr_block        = "10.0.1.0/24" # Substitua pelo bloco CIDR desejado para a subnet pública
-  availability_zone = "us-east-1a"  # Substitua pela zona de disponibilidade desejada
+  cidr_block        = "10.0.1.0/24" 
+  availability_zone = "us-east-1a"  
   map_public_ip_on_launch = true
 }
 
@@ -33,29 +33,31 @@ resource "aws_security_group" "ecs_sg" {
 resource "aws_ecs_cluster" "my_cluster" {
   name = "my-cluster"
 }
+####################################################################################################
 
 resource "aws_iam_role" "task_execution_role" {
   name               = "ecs-task-execution-role"
   assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "ecs-tasks.amazonaws.com"
-        },
-        "Action": "sts:AssumeRole"
-      }
-    ]
-  })
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+})
 }
 
 resource "aws_iam_policy" "ecs_policy" {
   name        = "ecs-policy"
   description = "Policy for ECS task registration"
   
-   policy = jsonencode({
-    "Version": "2012-10-17", 
+  policy = jsonencode({
+    "Version": "2012-10-17",
     "Statement": [
       {
         "Effect": "Allow",
@@ -65,10 +67,40 @@ resource "aws_iam_policy" "ecs_policy" {
           "ecs:RunTask"
         ],
         "Resource": "*"
+      },
+      {
+         "Sid":"PassRolesInTaskDefinition",
+         "Effect":"Allow",
+         "Action":[
+            "iam:PassRole"
+         ],
+         "Resource":[
+            "arn:aws:iam::123456789012:role/your_task_role_name",
+            "arn:aws:iam::123456789012:role/your_task_execution_role_name"
+         ]
+      },
+      {
+         "Sid":"DeployService",
+         "Effect":"Allow",
+         "Action":[
+            "ecs:DescribeServices",
+            "codedeploy:GetDeploymentGroup",
+            "codedeploy:CreateDeployment",
+            "codedeploy:GetDeployment",
+            "codedeploy:GetDeploymentConfig",
+            "codedeploy:RegisterApplicationRevision"
+         ],
+         "Resource":[
+            "arn:aws:ecs:us-east-1:123456789012:service/my-cluster/my-service",
+            "arn:aws:codedeploy:us-east-1:123456789012:deploymentgroup:your_application_name/your_deployment_group_name",
+            "arn:aws:codedeploy:us-east-1:123456789012:deploymentconfig:*",
+            "arn:aws:codedeploy:us-east-1:123456789012:application:your_application_name"
+         ]
       }
     ]
   })
 }
+
 
 resource "aws_iam_role_policy_attachment" "ecs_attachment" {
   role       = aws_iam_role.task_execution_role.name
