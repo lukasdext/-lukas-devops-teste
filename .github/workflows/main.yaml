@@ -44,12 +44,6 @@ jobs:
         environment: production
         needs: build
 
-        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
-        with:
-          task-definition: /home/runner/work/_temp/task-definition--2117-ubGt8t5TauO7-.json
-          service: my-service
-          cluster: my-cluster
-          wait-for-service-stability: true
         env:
           AWS_REGION: us-east-1
           ECR_REPOSITORY: my-repo
@@ -88,7 +82,7 @@ jobs:
       
           - name: Fill in the new image ID in the Amazon ECS task definition
             id: task-def
-            uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+            uses: aws-actions/amazon-ecs-render-task-definition@v1
             with:
               task-definition: ${{ env.ECS_TASK_DEFINITION }}
               container-name: ${{ env.CONTAINER_NAME }}
