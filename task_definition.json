@@ -1,21 +1,19 @@
 {
   "family": "my-task",
   "networkMode": "awsvpc",
-  "cpu": "256",
-  "memory": "512",
+  "cpu": "512",
+  "memory": "1024",
   "executionRoleArn": "arn:aws:iam::__AWS_ACCONT_COD__:role/ecsTaskExecutionRole",
 
   "containerDefinitions": [
     {
       "name": "CONTAINER_TESTE_DEVOPS",
       "image": "730335647486.dkr.ecr.us-east-1.amazonaws.com/my-repo:6043e03ef6803738aa5a6c143101d5fe58cafb7c",
-      "resourceRequirements": null,
       "essential": true,
       "portMappings": [
         {
-          "containerPort": "80",
-          "hostPort": "80",
-          "protocol": "tcp"
+          "containerPort": 80,
+          "hostPort": 80
         }
       ],
       "logConfiguration": {
