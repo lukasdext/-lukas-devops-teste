@@ -52,7 +52,8 @@ resource "aws_security_group" "ecs_sg" {
 resource "aws_ecs_cluster" "my_cluster" {
   name = "my-cluster"
 }
-####################################################################################################
+
+#######################################################
 
 resource "aws_iam_role" "ecsTaskExecutionRole" {
   name               = "ecsTaskExecutionRole"
@@ -70,82 +71,41 @@ resource "aws_iam_role" "ecsTaskExecutionRole" {
   })
 }
 
-
 resource "aws_iam_policy" "ecsPolicy" {
   name        = "ecsPolicy"
   description = "Policy for ECS task registration"
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    Version = "2012-10-17",
+    Statement = [
       {
-        "Sid": "RegisterTaskDefinition",
-        "Effect": "Allow",
-        "Action": [
+        Sid       = "RegisterTaskDefinition",
+        Effect    = "Allow",
+        Action    = [
           "ecs:RegisterTaskDefinition"
         ],
-        "Resource": "*"
+        Resource  = "*"
       },
       {
-        "Sid": "UpdateService",
-        "Effect": "Allow",
-        "Action": [
-          "ecs:UpdateService"
-        ],
-        "Resource": "*"
-      },
-      {
-        "Sid": "PassRolesInTaskDefinition",
-        "Effect": "Allow",
-        "Action": [
+        Sid       = "PassRolesInTaskDefinition",
+        Effect    = "Allow",
+        Action    = [
           "iam:PassRole"
         ],
-        "Resource": [
+        Resource  = [
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/my-task-role",
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/my-task-execution-role"
         ]
       },
       {
-        "Sid": "DeployService",
-        "Effect": "Allow",
-        "Action": [
+        Sid       = "DeployService",
+        Effect    = "Allow",
+        Action    = [
           "ecs:UpdateService",
           "ecs:DescribeServices"
         ],
-        "Resource": [
+        Resource  = [
           "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/my-cluster/my-service"
-        ]
-      },
-      {
-        "Effect": "Allow",
-        "Action": [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        "Resource": "*"
-      },
-      {
-        "Effect": "Allow",
-        "Action": "ecr:GetAuthorizationToken",
-        "Resource": "*"
-      },
-      {
-        "Effect": "Allow",
-        "Action": [
-          "ecs:RegisterTaskDefinition",
-          "ecs:UpdateService"
-        ],
-        "Resource": "*"
-      },
-      {
-        "Effect": "Allow",
-        "Action": "iam:*",
-        "Resource": [
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/*",
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:group/*"
         ]
       }
     ]
@@ -161,10 +121,7 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
-
-
 #######################################################
-
 
 resource "aws_ecs_task_definition" "my_task" {
   family                   = "my-task"
