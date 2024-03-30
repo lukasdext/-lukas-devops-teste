@@ -8,8 +8,8 @@
 
   "containerDefinitions": [
     {
-      "name": "CONTAINER_TESTE_DEVOPS",
-      "image": "730335647486.dkr.ecr.us-east-1.amazonaws.com/my-repo:adc2b824094fb177ebf9cd5f8bb4bca796e904b7",
+      "name": "teste-devops",
+      "image": "teste-devops-img",
       "essential": true,
       "portMappings": [
         {
