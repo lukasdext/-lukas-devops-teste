@@ -1,8 +1,9 @@
 {
   "family": "my-task",
   "networkMode": "awsvpc",
-  "cpu": "512",
-  "memory": "1024",
+  "cpu": "1 vCPU",
+  "memory": "3 GB",
+  "volumes": [],
   "executionRoleArn": "arn:aws:iam::__AWS_ACCONT_COD__:role/ecsTaskExecutionRole",
 
   "containerDefinitions": [
