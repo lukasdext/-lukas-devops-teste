@@ -6,6 +6,25 @@ resource "aws_ecr_repository" "my_repo" {
   name = "my-repo"
 }
 
+resource "aws_ecr_repository_policy" "my_repo_policy" {
+  repository = aws_ecr_repository.my_repo.name
+
+  policy = jsonencode({
+    "Version": "2008-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability"
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_vpc" "my_vpc" {
   cidr_block = "10.0.0.0/16"
 }
@@ -158,7 +177,7 @@ resource "aws_ecs_task_definition" "my_task" {
   container_definitions = jsonencode([
     {
       "name": "teste-devops",
-      "image": "teste-devops",
+      "image": "teste-devops-img",
       "essential": true,
       "portMappings": [
         {
