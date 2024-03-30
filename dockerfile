@@ -1,13 +1,9 @@
-# Definindo a Imagem base.
-FROM node:12.18.3-alpine3.12
+FROM node:alpine
 
-COPY ./ ./
+WORKDIR /usr/app
 
-WORKDIR /app
+COPY . /usr/app
 
 EXPOSE 3000
 
-RUN npm install
-
-# Executando aplicacão no Container.
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]

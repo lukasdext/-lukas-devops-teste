@@ -9,11 +9,11 @@
   "containerDefinitions": [
     {
       "name": "CONTAINER_TESTE_DEVOPS",
-      "image": "730335647486.dkr.ecr.us-east-1.amazonaws.com/my-repo:6043e03ef6803738aa5a6c143101d5fe58cafb7c",
+      "image": "img-devops-teste",
       "essential": true,
       "portMappings": [
         {
-          "containerPort": 80,
+          "containerPort": 3000,
           "hostPort": 80
         }
       ],
