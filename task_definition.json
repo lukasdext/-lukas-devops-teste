@@ -5,7 +5,6 @@
   "memory": "3 GB",
   "volumes": [],
   "executionRoleArn": "arn:aws:iam::__AWS_ACCONT_COD__:role/ecsTaskExecutionRole",
-
   "containerDefinitions": [
     {
       "name": "teste-devops",
@@ -27,5 +26,10 @@
       }
     }
   ],
-  "requiresCompatibilities": ["FARGATE"]
+  "requiresCompatibilities": ["FARGATE"],
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "assignPublicIp": true
+    }
+  }
 }
