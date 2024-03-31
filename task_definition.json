@@ -5,6 +5,7 @@
   "memory": "3 GB",
   "volumes": [],
   "executionRoleArn": "arn:aws:iam::__AWS_ACCONT_COD__:role/ecsTaskExecutionRole",
+
   "containerDefinitions": [
     {
       "name": "teste-devops",
@@ -22,11 +23,6 @@
           "awslogs-group": "ecs-logs",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
-        }
-      },
-      "networkConfiguration": {
-        "awsvpcConfiguration": {
-          "assignPublicIp": "ENABLED"
         }
       }
     }

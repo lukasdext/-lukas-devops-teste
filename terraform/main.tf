@@ -150,6 +150,11 @@ resource "aws_ecs_task_definition" "my_task" {
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
+      },
+      "networkConfiguration": {
+        "awsvpcConfiguration": {
+          "assignPublicIp": "ENABLED"
+        }
       }
     }
   ])
