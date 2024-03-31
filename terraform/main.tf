@@ -129,6 +129,10 @@ data "aws_region" "current" {}
 
 #######################################################
 
+resource "aws_secretsmanager_secret" "my_secret" {
+  name = "my-secret"
+}
+
 resource "aws_ecs_task_definition" "my_task" {
   family                   = "my-task"
   network_mode             = "awsvpc"
@@ -139,8 +143,14 @@ resource "aws_ecs_task_definition" "my_task" {
 
   container_definitions = jsonencode([
     {
-      "name": "teste-devops",
-      "image": "node:latest",
+      "name": "my-container",
+      "image": "my-image",
+      "secrets": [
+        {
+          "name": "MY_SECRET",
+          "valueFrom": aws_secretsmanager_secret.my_secret.arn
+        }
+      ],
       "essential": true,
       "portMappings": [
         {
@@ -165,6 +175,8 @@ resource "aws_ecs_task_definition" "my_task" {
     }
   ])
 }
+
+
 
 resource "aws_ecs_service" "my_service" {
   name            = "my-service"
