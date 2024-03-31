@@ -23,13 +23,13 @@
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
+      },
+      "networkConfiguration": {
+        "awsvpcConfiguration": {
+          "assignPublicIp": "ENABLED"
+        }
       }
     }
   ],
-  "requiresCompatibilities": ["FARGATE"],
-  "networkConfiguration": {
-    "awsvpcConfiguration": {
-      "assignPublicIp": "ENABLED"
-    }
-  }
+  "requiresCompatibilities": ["FARGATE"]
 }
