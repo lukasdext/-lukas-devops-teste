@@ -130,7 +130,7 @@ data "aws_region" "current" {}
 #######################################################
 
 resource "aws_secretsmanager_secret" "my_secret" {
-  name = "my-secret"
+  name = "my-secrett"
 }
 
 resource "aws_ecs_task_definition" "my_task" {
@@ -144,11 +144,11 @@ resource "aws_ecs_task_definition" "my_task" {
   container_definitions = jsonencode([
     {
       "name": "my-container",
-      "image": "my-image",
+      "image": "730335647486.dkr.ecr.us-east-1.amazonaws.com/my-repo:f26228e0236e9bc46ea978a824f4627821cf2415",
       "secrets": [
         {
           "name": "MY_SECRET",
-          "valueFrom": aws_secretsmanager_secret.my_secret.arn
+          "valueFrom": "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:my-secrett:MY_SECRET::"
         }
       ],
       "essential": true,
