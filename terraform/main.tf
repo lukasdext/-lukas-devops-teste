@@ -2,27 +2,21 @@ provider "aws" {
   region = "us-east-1" # Defina a região desejada
 }
 
-resource "aws_ecr_repository" "my_repo" {
-  name = "my-repo"
-}
+resource "aws_ecrpublic_repository" "my_repo" {
 
-resource "aws_ecr_repository_policy" "my_repo_policy" {
-  repository = aws_ecr_repository.my_repo.name
+  repository_name = "my-repo"
 
-  policy = jsonencode({
-    "Version": "2008-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": "*",
-        "Action": [
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "ecr:BatchCheckLayerAvailability"
-        ]
-      }
-    ]
-  })
+  catalog_data {
+    about_text        = "About Text"
+    architectures     = ["ARM"]
+    description       = "Description"
+    operating_systems = ["Linux"]
+    usage_text        = "Usage Text"
+  }
+
+  tags = {
+    env = "production"
+  }
 }
 
 resource "aws_vpc" "my_vpc" {
@@ -194,6 +188,7 @@ resource "aws_ecs_service" "my_service" {
   task_definition = aws_ecs_task_definition.my_task.arn
   desired_count   = 1
   launch_type     = "FARGATE"
+  
   
   network_configuration {
     subnets         = [aws_subnet.public_subnet.id]
