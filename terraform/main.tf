@@ -118,10 +118,27 @@ resource "aws_iam_policy" "ecsPolicy" {
         Resource  = [
           "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/my-cluster/my-service"
         ]
+      },
+      {
+        Sid       = "GetAuthorizationToken",
+        Effect    = "Allow",
+        Action    = [
+          "ecr:GetAuthorizationToken"
+        ],
+        Resource  = "*"
+      },
+      {
+        Sid       = "BatchCheckLayerAvailability",
+        Effect    = "Allow",
+        Action    = [
+          "ecr:BatchCheckLayerAvailability"
+        ],
+        Resource  = "*"
       }
     ]
   })
 }
+
 
 resource "aws_iam_role_policy_attachment" "ecsPolicyAttachment" {
   role       = aws_iam_role.ecsTaskExecutionRole.name
@@ -145,7 +162,7 @@ resource "aws_ecs_task_definition" "my_task" {
   container_definitions = jsonencode([
     {
       "name": "teste-devops",
-      "image": "730335647486.dkr.ecr.us-east-1.amazonaws.com/my-repo:6d91026eb1c671d873434f8f8bf5127bdb8b951b",
+      "image": "node:latest",
       "essential": true,
       "portMappings": [
         {
