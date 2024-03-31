@@ -134,7 +134,7 @@ resource "aws_ecs_task_definition" "my_task" {
   container_definitions = jsonencode([
     {
       "name": "teste-devops",
-      "image": "teste-devops-img",
+      "image": "730335647486.dkr.ecr.us-east-1.amazonaws.com/my-repo:6d91026eb1c671d873434f8f8bf5127bdb8b951b",
       "essential": true,
       "portMappings": [
         {
