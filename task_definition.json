@@ -29,7 +29,7 @@
   "requiresCompatibilities": ["FARGATE"],
   "networkConfiguration": {
     "awsvpcConfiguration": {
-      "assignPublicIp": true
+      "assignPublicIp": "ENABLED"
     }
   }
 }
