@@ -2,21 +2,8 @@ provider "aws" {
   region = "us-east-1" # Defina a região desejada
 }
 
-resource "aws_ecrpublic_repository" "my_repo" {
-
-  repository_name = "my-repo"
-
-  catalog_data {
-    about_text        = "About Text"
-    architectures     = ["ARM"]
-    description       = "Description"
-    operating_systems = ["Linux"]
-    usage_text        = "Usage Text"
-  }
-
-  tags = {
-    env = "production"
-  }
+resource "aws_ecr_repository" "my_repo" {
+  name = "my-repo"
 }
 
 resource "aws_vpc" "my_vpc" {
@@ -49,9 +36,6 @@ resource "aws_security_group" "ecs_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-
-
 
 
 resource "aws_ecs_cluster" "my_cluster" {
